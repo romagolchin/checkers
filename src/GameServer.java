@@ -10,48 +10,47 @@ public class GameServer {
     }
 
     public void play() {
-        int win;
-        boolean gameContinues = true;
         configuration.currentMove = CellState.WHITE;
-        while (gameContinues) {
-            if(configuration.currentMove == CellState.BLACK)
+        while (true) {
+            boolean isMoveCorrect = false;
+            if (configuration.currentMove == CellState.BLACK)
                 System.out.println("black move");
-            else if(configuration.currentMove == CellState.WHITE)
+            else if (configuration.currentMove == CellState.WHITE)
                 System.out.println("white move");
+            if (!black.hasMoves(configuration) && !white.hasMoves(configuration)) {
+                System.out.println("draw");
+                break;
+            }
             if (configuration.currentMove == CellState.BLACK) {
-                gameContinues &= black.hasMoves(configuration) && white.hasMoves(configuration);
+
                 if (black.hasMoves(configuration)) {
                     try {
                         black.makeMove(configuration);
+                        isMoveCorrect = true;
                     } catch (MoveException e) {
-                        e.printStackTrace();
+                        System.out.println(e.getMessage());
                     }
-                } else {
-                    configuration.currentMove = CellState.WHITE;
-                    try {
-                        white.makeMove(configuration);
-                    } catch (MoveException e) {
-                        e.printStackTrace();
-                    }
+
+                } else if (white.hasMoves(configuration)) {
+                    System.out.println("white win");
+                    break;
                 }
             } else {
-                gameContinues &= black.hasMoves(configuration) && white.hasMoves(configuration);
                 if (white.hasMoves(configuration)) {
                     try {
                         white.makeMove(configuration);
+                        isMoveCorrect = true;
                     } catch (MoveException e) {
-                        e.printStackTrace();
+                        System.out.println(e.getMessage());
                     }
-                } else {
-                    configuration.currentMove = CellState.BLACK;
-                    try {
-                        black.makeMove(configuration);
-                    } catch (MoveException e) {
-                        e.printStackTrace();
-                    }
+                } else if(black.hasMoves(configuration)){
+                    System.out.println("black win");
+                    break;
                 }
             }
-            configuration.currentMove = BoardConfiguration.opposite(configuration.currentMove);
+//            System.out.println(isMoveCorrect ? "y" : "n");
+            if (isMoveCorrect)
+                configuration.currentMove = BoardConfiguration.opposite(configuration.currentMove);
         }
     }
 }

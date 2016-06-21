@@ -21,32 +21,39 @@ public class HumanPlayer implements Player {
                 sb.append(move.charAt(i));
         }
         String trimmedMove = new String(sb);
-        if((trimmedMove.length() % 2 != 0) || (trimmedMove.length() <= 2))
+        if ((trimmedMove.length() % 2 != 0) || (trimmedMove.length() <= 2))
             throw new MoveException("invalid move format");
-        for(int i = 0; i < trimmedMove.length() / 2 - 1; ++i) {
+        for (int i = 0; i < trimmedMove.length() / 2 - 1; ++i) {
             int x = (int) trimmedMove.charAt(2 * i) - (int) 'a';
             int y = (int) trimmedMove.charAt(2 * i + 1) - (int) '1';
             int newX = (int) trimmedMove.charAt(2 * i + 2) - (int) 'a';
             int newY = (int) trimmedMove.charAt(2 * i + 3) - (int) '1';
+            if(!configuration.inBoard(newX, newY) || (i == 0 && !configuration.inBoard(x, y)))
+                throw new MoveException("no such cell");
             int dx = newX - x;
             int dy = newY - y;
-            if(!configuration.isDirectionValid(dx, dy))
-                throw new MoveException("invalid move from " + (char) ((int) 'a' + x) + " " + (char) ((int) 'a' + y) + " to " + newX + " " + newY);
-            if(Math.abs(dx) == Math.abs(dy)) {
-                if(Math.abs(dx) == 1 && configuration.board[x][y] == configuration.currentMove && configuration.isFree(x + dx, y + dy)) {
+            if (!configuration.isDirectionValid(dx, dy))
+                throw new MoveException("invalid silent move from " + (char) ((int) 'a' + x) + " " + (y + 1)
+                        + " to " + (char) ((int) 'a' + newX) + " " + (newY + 1));
+            if (Math.abs(dx) == Math.abs(dy)) {
+                if (Math.abs(dx) == 1 && configuration.board[x][y] == configuration.currentMove
+                        && configuration.isFree(x + dx, y + dy) && !configuration.isPossibleToTake()) {
+                    if (trimmedMove.length() != 4)
+                        throw new MoveException("only one silent move is allowed");
                     configuration.board[x][y] = CellState.NONE;
                     configuration.board[x + dx][y + dy] = configuration.currentMove;
-                }
-                else if(Math.abs(dx) == 2 && configuration.board[x][y] == configuration.currentMove
+                } else if (Math.abs(dx) == 2 && configuration.board[x][y] == configuration.currentMove
                         && configuration.board[x + dx / 2][y + dy / 2] == BoardConfiguration.opposite(configuration.currentMove)) {
                     configuration.board[x][y] = CellState.NONE;
                     configuration.board[x + dx / 2][y + dy / 2] = CellState.NONE;
                     configuration.board[x + dx][y + dy] = configuration.currentMove;
-                }
-                else
+                } else
                     throw new MoveException("invalid move");
             }
+            else
+                throw new MoveException("move is not diagonal");
         }
-
     }
+
+
 }

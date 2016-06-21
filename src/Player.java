@@ -1,8 +1,5 @@
-
-
-
 public interface Player {
-    int[][] dirs = {{1, 1}, {-1, 1}, {-1, -1}, {1, -1}};
+
 
     void makeMove(BoardConfiguration configuration) throws MoveException;
 
@@ -11,8 +8,8 @@ public interface Player {
         for(int x = 0; x < 8; ++x)
             for(int y = 0; y < 8; ++y) {
                 for(int k = 0; k < 4; ++k) {
-                    int dx = dirs[k][0];
-                    int dy = dirs[k][1];
+                    int dx = BoardConfiguration.dirs[k][0];
+                    int dy = BoardConfiguration.dirs[k][1];
                     res |= (configuration.isFree(x + dx, y + dy));
                     res |= (configuration.inBoard(x + dx, y + dy) &&
                             configuration.board[x + dx][y + dy] ==
